@@ -1,6 +1,8 @@
 import numpy as np
 import random
 import chess
+import torch
+from train import Net
 
 class State():
     def __init__(self, self_play=False, color=chess.WHITE, board=None):
@@ -35,16 +37,24 @@ class State():
     def search_moves(self):
         moves = list(self.board.legal_moves)
         move_tuples = []
-        # replace random move generation with evaluator
-        move_to_play = random.randint(0, len(moves) - 1)
         for i in range(0, len(moves)):
             self.board.push(moves[i])
-            # search moves, plug into model
-            # use and evaluator class
-            # represent as tuples with value and move
+            move_tuples.append((self.eval_move().item(), moves[i]))
             self.board.pop()
-            pass
-        return moves[move_to_play]# move_tuples[0]
+        move_tuples.sort(reverse=True)
+        if self.board.turn == chess.WHITE:
+            return move_tuples[0][1]
+        else:
+            return move_tuples[-1][1]
+
+    def eval_move(self):
+        model = Net()
+        model.load_state_dict(torch.load('model/v1.pt'))
+        state = torch.tensor(self.fen_to_bits()).float().view(1, 12, 64) # shape
+        prediction = model(state)
+        return prediction
+
+
 
     def move(self, move):
         self.states.append(self.fen_to_bits())
@@ -74,11 +84,14 @@ class State():
                         continue
                     self.move(human_move)
         result = {"1-0": 1, "1/2-1/2": 0, "0-1": -1}[self.board.result()]
+        print(result)
         for i in range(0, len(self.states)):
             self.states[i] = (np.array(result).astype(np.byte), np.array(self.states[i]))
         return np.array(self.states)
 
+
 if __name__ == "__main__":
-    s = State(self_play=True)
-    print(s.play())
+    for i in range(20):
+        s = State(self_play=True)
+        s.play()
 

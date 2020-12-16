@@ -2,7 +2,7 @@ import numpy as np
 from state import State
 
 if __name__ == "__main__":
-    num_games = 10
+    num_games = 1000
 
     states = []
 
