@@ -76,8 +76,3 @@ class State():
             self.states[i] = (result, self.states[i])
         print(self.states)
         return self.states
-
-if __name__ == "__main__":
-    s = State(self_play=True)
-    s.play()
-
