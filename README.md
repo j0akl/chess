@@ -9,3 +9,5 @@ understand the whole game, need to test that though.
 train model on value of each position based on the possible move
 
 Start training from random moves
+
+next: generate a batch of training data, 1k games?

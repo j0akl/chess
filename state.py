@@ -50,11 +50,11 @@ class State():
 
     def play(self):
         while not self.board.is_game_over():
-            print('\n')
-            print({True: 'White', False: "Black"}[self.board.turn] + " to play")
-            print(self.board.unicode())
+            # print('\n')
+            # print({True: 'White', False: "Black"}[self.board.turn] + " to play")
+            # print(self.board.unicode())
             # save the board at each position
-            print('\n')
+            # print('\n')
             if self.self_play == True:
                 move_to_play = self.search_moves()
                 self.move(move_to_play)
@@ -73,6 +73,5 @@ class State():
                     self.move(human_move)
         result = {"1-0": 1, "1/2-1/2": 0, "0-1": -1}[self.board.result()]
         for i in range(0, len(self.states)):
-            self.states[i] = (result, self.states[i])
-        print(self.states)
-        return self.states
+            self.states[i] = (result, np.array(self.states[i]))
+        return np.array(self.states)
