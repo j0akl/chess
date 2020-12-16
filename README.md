@@ -1,20 +1,11 @@
 # Chess Engine
 
-think of better representation for board state
- - needs to handle all rights (castling, en passant, etc)
-
 Representation:
-
-- turn: 1 bit
-- positions of pieces
- - number each square, numbers 1-15 represent piece types white and black (?)
- - 1 byte for each square
-- en passant: 16 bits
-- castle: 4 bits
-- check 2 bits
-total: 534 (can be cut down?)
+using self.board.pieces bitmask to represent pieces, will have to see if that
+works for training or not. Dont think I need to represent checks or anything
+because that will be handled by legal move generation. Over training it should
+understand the whole game, need to test that though.
 
 train model on value of each position based on the possible move
 
-Start training from random moves, find a way to represent value of a position
-attach value of game to each board state? might be the way to go
+Start training from random moves
