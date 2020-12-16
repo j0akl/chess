@@ -23,12 +23,14 @@ class State():
             # use board.pieces to get int representations of the board
             # alternating white->black, P R N B Q K
             for i in range(1, 7):
-                converted_board.append(int(self.board.pieces(i, chess.WHITE)))
-                converted_board.append(int(self.board.pieces(i, chess.BLACK)))
+                converted_board.append(self.board.pieces(i,
+                                                         chess.WHITE).tolist())
+                converted_board.append(self.board.pieces(i,
+                                                         chess.BLACK).tolist())
         else:
             # used for parsing games from pgn, might not be needed
             pass
-        return converted_board
+        return np.array(converted_board).astype(np.byte)
 
     def search_moves(self):
         moves = list(self.board.legal_moves)
@@ -73,5 +75,10 @@ class State():
                     self.move(human_move)
         result = {"1-0": 1, "1/2-1/2": 0, "0-1": -1}[self.board.result()]
         for i in range(0, len(self.states)):
-            self.states[i] = (result, np.array(self.states[i]))
+            self.states[i] = (np.array(result).astype(np.byte), np.array(self.states[i]))
         return np.array(self.states)
+
+if __name__ == "__main__":
+    s = State(self_play=True)
+    print(s.play())
+

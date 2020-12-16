@@ -2,7 +2,7 @@ import numpy as np
 from state import State
 
 if __name__ == "__main__":
-    num_games = 100
+    num_games = 10
 
     states = []
 
@@ -14,8 +14,9 @@ if __name__ == "__main__":
             states.append(game[i])
 
     numpy_games = np.array(states)
+    print(numpy_games.shape)
 
     # create and save the array
-    f = open("data/first.npz", 'wb')
+    f = open("data/10_games.npz", 'wb')
     np.savez(f, numpy_games)
     f.close()
