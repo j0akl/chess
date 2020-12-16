@@ -42,6 +42,5 @@ class Net(nn.Module):
 
 if __name__ == "__main__":
     train_dl, val_dl = create_dataloaders('data/10_games.npz')
-    print(len(train_dl))
 
 
