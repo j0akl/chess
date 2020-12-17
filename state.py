@@ -5,7 +5,8 @@ import torch
 from train import Net
 
 class State():
-    def __init__(self, self_play=False, color=chess.WHITE, board=None):
+    def __init__(self, random=False, self_play=False, color=chess.WHITE,
+                 board=None, fen=None):
         # color one of chess.WHITE, chess.BLACK
         # default white
         self.color = color
@@ -14,8 +15,15 @@ class State():
 
         self.self_play = self_play
 
-        if board is not None:
+        # change the filename here when using different models
+        if random == False:
+            self.model = Net()
+            self.model.load_state_dict(torch.load('model/v1.pt'))
+
+        if board is not None and fen is None:
             self.board = board
+        elif fen is not None:
+            self.board = chess.Board(fen)
         else:
             self.board = chess.Board()
 
@@ -36,22 +44,24 @@ class State():
 
     def search_moves(self):
         moves = list(self.board.legal_moves)
-        move_tuples = []
-        for i in range(0, len(moves)):
-            self.board.push(moves[i])
-            move_tuples.append((self.eval_move().item(), moves[i]))
-            self.board.pop()
-        move_tuples.sort(reverse=True)
-        if self.board.turn == chess.WHITE:
-            return move_tuples[0][1]
+        if random == False:
+            move_tuples = []
+            for i in range(0, len(moves)):
+                self.board.push(moves[i])
+                move_tuples.append((self.eval_move().item(), moves[i]))
+                self.board.pop()
+            move_tuples.sort(key = lambda x: x[0], reverse=True)
+            if self.board.turn == chess.WHITE:
+                return move_tuples[0][1]
+            else:
+                return move_tuples[-1][1]
         else:
-            return move_tuples[-1][1]
+            rand = random.randint(0, len(moves) - 1)
+            return moves[rand]
 
     def eval_move(self):
-        model = Net()
-        model.load_state_dict(torch.load('model/v1.pt'))
         state = torch.tensor(self.fen_to_bits()).float().view(1, 12, 64) # shape
-        prediction = model(state)
+        prediction = self.model(state)
         return prediction
 
 
@@ -62,15 +72,14 @@ class State():
 
     def play(self):
         while not self.board.is_game_over():
-            # print('\n')
-            # print({True: 'White', False: "Black"}[self.board.turn] + " to play")
-            # print(self.board.unicode())
-            # save the board at each position
-            # print('\n')
             if self.self_play == True:
                 move_to_play = self.search_moves()
                 self.move(move_to_play)
             else:
+                print('\n')
+                print({True: 'White', False: "Black"}[self.board.turn] + " to play")
+                print(self.board)
+                print('\n')
                 if self.board.turn == self.color:
                     move_to_play = self.search_moves()
                     self.move(move_to_play)
@@ -84,14 +93,16 @@ class State():
                         continue
                     self.move(human_move)
         result = {"1-0": 1, "1/2-1/2": 0, "0-1": -1}[self.board.result()]
-        print(result)
         for i in range(0, len(self.states)):
             self.states[i] = (np.array(result).astype(np.byte), np.array(self.states[i]))
         return np.array(self.states)
 
 
 if __name__ == "__main__":
+    # s = State(self_play=False)
+    # s.play()
     for i in range(20):
-        s = State(self_play=True)
+        s = State(self_play=True, random=True)
         s.play()
+        print("game {}: {}".format(i + 1, s.board.result()))
 
