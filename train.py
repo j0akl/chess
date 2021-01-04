@@ -124,11 +124,11 @@ def train_and_save_model(data_path, model_path, device='cpu'):
 
 if __name__ == "__main__":
     # TODO: update function parameters
-    train_dl, val_dl = create_dataloaders('data/nd_10k_games.npz', 128)
+    train_dl, val_dl = create_dataloaders('data/1k_games.npz', 32)
 
     model = Net().float()
 
-    optimizer = optim.Adam(model.parameters())
+    optimizer = optim.Adam(model.parameters(), lr=0.001)
 
     num_epochs = 5
 
@@ -136,8 +136,8 @@ if __name__ == "__main__":
         train(model, train_dl, optimizer, epoch)
         test(model, val_dl)
 
-    f = open('model/nd_v1.pt', 'w')
-    torch.save(model.state_dict(), 'model/nd_v1.pt')
+    f = open('model/1k_games_v1.pt', 'w')
+    torch.save(model.state_dict(), 'model/1k_games_v1.pt')
     f.close()
 
 

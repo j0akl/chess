@@ -12,7 +12,7 @@ class State():
         self.color = color
 
         self.random = random
-        
+
         self.device = device
 
         self.states = [] # change this if parsing from pgn
@@ -33,16 +33,22 @@ class State():
             self.board = chess.Board()
 
     def fen_to_bits(self, pgn=None):
-        # TODO : Add turn to representation, as well as other state items
+        # TODO: if needed, add en passant, check, etc
         converted_board = [] # np.zeros(shape of data)
         if pgn == None:
             # use board.pieces to get int representaions of the board
             # alternating white->black, P R N B Q K
             for i in range(1, 7):
-                converted_board.append(self.board.pieces(i,
-                                                         chess.WHITE).tolist())
-                converted_board.append(self.board.pieces(i,
-                                                         chess.BLACK).tolist())
+                turn = bool(self.board.turn)
+
+                white_moves = self.board.pieces(i, chess.WHITE).tolist()
+                white_moves.append(turn)
+
+                black_moves = self.board.pieces(i, chess.BLACK).tolist()
+                black_moves.append(turn)
+
+                converted_board.append(white_moves)
+                converted_board.append(black_moves)
         else:
             # used for parsing games from pgn, might not be needed
             pass
@@ -66,7 +72,7 @@ class State():
             return moves[rand]
 
     def eval_move(self):
-        state = torch.tensor(self.fen_to_bits()).float().view(1, 12, 64).to(self.device) # shape
+        state = torch.tensor(self.fen_to_bits()).float().view(1, 12, 65).to(self.device) # shape
         prediction = self.model(state)
         return prediction
 

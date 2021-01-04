@@ -2,6 +2,7 @@ import numpy as np
 from state import State
 
 def generate_games(num_games, games_location,  net_location=None):
+
     states = []
 
     for i in range(num_games):
@@ -10,14 +11,15 @@ def generate_games(num_games, games_location,  net_location=None):
         else:
             s = State(self_play=True, random=True)
         game = s.play()
-        for i in range(len(game)):
-            states.append(game[i])
-#         if i % 10 == 0:
-#             print("game ", str(i + 1))
+        for state in game:
+            states.append(state)
+
+        if i % 10 == 0:
+            print("game ", str(i))
 
     no_draws = list(filter(lambda x: x[0] != 0, states))
 
-    numpy_games = np.array(no_draws)
+    numpy_games = np.array(no_draws) # states)
     print("Done")
 
     # create and save the array
@@ -26,5 +28,6 @@ def generate_games(num_games, games_location,  net_location=None):
     np.savez(f, numpy_games)
     f.close()
 
-# if __name__ == "__main__":
+if __name__ == "__main__":
+    generate_games(1000, "data/1k_games_v2.npz", net_location="model/1k_games_v1.pt")
 
