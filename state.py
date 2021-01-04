@@ -7,11 +7,9 @@ from train import Net
 class State():
     def __init__(self, random=False, self_play=False, color=chess.WHITE,
                  board=None, fen=None, net_location="", device="cpu"):
-        # color one of chess.WHITE, chess.BLACK
-        # default white
-        self.color = color
-
         self.random = random
+
+        self.color = color
 
         self.device = device
 
@@ -63,7 +61,11 @@ class State():
                 move_tuples.append((self.eval_move().item(), moves[i]))
                 self.board.pop()
             move_tuples.sort(key = lambda x: x[0], reverse=True)
-            print("Moves: ", move_tuples[0][1])
+            if not self.self_play:
+                if self.color == chess.WHITE:
+                    print("Moves: ", move_tuples[0][1])
+                else:
+                    print("Moves: ", move_tuples[-1][1])
             if self.board.turn == chess.WHITE:
                 return move_tuples[0][1]
             else:
@@ -106,13 +108,17 @@ class State():
         result = {"1-0": 1, "1/2-1/2": 0, "0-1": -1}[self.board.result()]
         for i in range(0, len(self.states)):
             self.states[i] = (np.array(result).astype(np.byte), np.array(self.states[i]))
-        return np.array(self.states)
+        states = self.states
+        self.states = []
+        self.board = chess.Board()
+        return states
 
 if __name__ == "__main__":
     # s = State(self_play=False)
     # s.play()
     for i in range(20):
-        s = State(self_play=False, net_location="model/1k_games_v1.pt")
+        s = State(self_play=False, net_location="model/10k_v2.pt",
+                  color=chess.WHITE)
         s.play()
         print("game {}: {}".format(i + 1, s.board.result()))
 

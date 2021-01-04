@@ -5,11 +5,12 @@ def generate_games(num_games, games_location,  net_location=None):
 
     states = []
 
+    if net_location is not None:
+        s = State(self_play=True, random=False, net_location=net_location)
+    else:
+        s = State(self_play=True, random=True)
+
     for i in range(num_games):
-        if net_location is not None:
-            s = State(self_play=True, random=False, net_location=net_location)
-        else:
-            s = State(self_play=True, random=True)
         game = s.play()
         for state in game:
             states.append(state)
@@ -29,5 +30,5 @@ def generate_games(num_games, games_location,  net_location=None):
     f.close()
 
 if __name__ == "__main__":
-    generate_games(1000, "data/1k_games_v2.npz", net_location="model/1k_games_v1.pt")
+    generate_games(1000, "data/1k_v2.npz", "model/10k_v1.pt")
 
