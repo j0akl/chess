@@ -9,3 +9,6 @@ understand the whole game, need to test that though.
 data is represented as an array of 12 boolean arrays length 64, these are the
 bitboard representations of the state of the board. Each is paired with the result of
 the game
+
+CURRENT STATUS:
+Predicts moves, beats the 250 rated chess.com engine consistently

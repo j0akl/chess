@@ -63,6 +63,7 @@ class State():
                 move_tuples.append((self.eval_move().item(), moves[i]))
                 self.board.pop()
             move_tuples.sort(key = lambda x: x[0], reverse=True)
+            print("Moves: ", move_tuples[0][1])
             if self.board.turn == chess.WHITE:
                 return move_tuples[0][1]
             else:
@@ -111,7 +112,7 @@ if __name__ == "__main__":
     # s = State(self_play=False)
     # s.play()
     for i in range(20):
-        s = State(self_play=True, random=True)
+        s = State(self_play=False, net_location="model/1k_games_v1.pt")
         s.play()
         print("game {}: {}".format(i + 1, s.board.result()))
 
