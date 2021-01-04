@@ -6,19 +6,24 @@ from train import Net
 
 class State():
     def __init__(self, random=False, self_play=False, color=chess.WHITE,
-                 board=None, fen=None):
+                 board=None, fen=None, net_location="", device="cpu"):
         # color one of chess.WHITE, chess.BLACK
         # default white
         self.color = color
+
+        self.random = random
+        
+        self.device = device
 
         self.states = [] # change this if parsing from pgn
 
         self.self_play = self_play
 
         # change the filename here when using different models
-        if random == False:
+        if self.random == False:
             self.model = Net()
-            self.model.load_state_dict(torch.load('model/v1.pt'))
+            self.model.to(device)
+            self.model.load_state_dict(torch.load(net_location))
 
         if board is not None and fen is None:
             self.board = board
@@ -28,9 +33,10 @@ class State():
             self.board = chess.Board()
 
     def fen_to_bits(self, pgn=None):
+        # TODO : Add turn to representation, as well as other state items
         converted_board = [] # np.zeros(shape of data)
         if pgn == None:
-            # use board.pieces to get int representations of the board
+            # use board.pieces to get int representaions of the board
             # alternating white->black, P R N B Q K
             for i in range(1, 7):
                 converted_board.append(self.board.pieces(i,
@@ -44,7 +50,7 @@ class State():
 
     def search_moves(self):
         moves = list(self.board.legal_moves)
-        if random == False:
+        if self.random == False:
             move_tuples = []
             for i in range(0, len(moves)):
                 self.board.push(moves[i])
@@ -60,11 +66,9 @@ class State():
             return moves[rand]
 
     def eval_move(self):
-        state = torch.tensor(self.fen_to_bits()).float().view(1, 12, 64) # shape
+        state = torch.tensor(self.fen_to_bits()).float().view(1, 12, 64).to(self.device) # shape
         prediction = self.model(state)
         return prediction
-
-
 
     def move(self, move):
         self.states.append(self.fen_to_bits())
@@ -96,7 +100,6 @@ class State():
         for i in range(0, len(self.states)):
             self.states[i] = (np.array(result).astype(np.byte), np.array(self.states[i]))
         return np.array(self.states)
-
 
 if __name__ == "__main__":
     # s = State(self_play=False)

@@ -7,7 +7,6 @@ import torch.optim as optim
 from math import floor, ceil
 
 def create_dataloaders(filepath, batch_size=32):
-
     # creates a train and val dl with an 80/20 split, train data is shuffled
     raw_data = np.load(filepath, allow_pickle=True)['arr_0']
 
@@ -90,7 +89,7 @@ def train(model, train_loader, optimizer, epoch, device="cpu"):
         optimizer.step()
         if batch_idx % 100 == 0:
             print('Train Epoch: {} [{}/{} ({:.0f}%)]\tLoss: {:.6f}'.format(
-                    epoch, batch_idx * len(data), len(train_loader.dataset),
+                    epoch + 1, batch_idx * len(data), len(train_loader.dataset),
                     100. * batch_idx / len(train_loader), loss.item()))
 
 def test(model, test_loader, device='cpu'):
@@ -106,21 +105,39 @@ def test(model, test_loader, device='cpu'):
 
     print('\nTest set: Average loss: {:.4f}\n'.format(test_loss))
 
+def train_and_save_model(data_path, model_path, device='cpu'):
+    train_dl, val_dl = create_dataloaders(data_path, 128)
+
+    model = Net().float()
+    model.to(device)
+
+    optimizer = optim.Adam(model.parameters())
+
+    num_epochs = 5
+    for epoch in range(num_epochs):
+        train(model, train_dl, optimizer, epoch, device=device)
+        test(model, val_dl, device=device)
+
+    f = open(model_path, 'w')
+    torch.save(model.state_dict(), model_path)
+    f.close()
+
 if __name__ == "__main__":
-    train_dl, val_dl = create_dataloaders('data/1k_games.npz', 128)
+    # TODO: update function parameters
+    train_dl, val_dl = create_dataloaders('data/nd_10k_games.npz', 128)
 
     model = Net().float()
 
-    optimizer = optim.Adadelta(model.parameters())
+    optimizer = optim.Adam(model.parameters())
 
-    num_epochs = 1
+    num_epochs = 5
 
     for epoch in range(num_epochs):
         train(model, train_dl, optimizer, epoch)
         test(model, val_dl)
 
-    f = open('model/v1.pt', 'w')
-    torch.save(model.state_dict(), 'model/v1.pt')
+    f = open('model/nd_v1.pt', 'w')
+    torch.save(model.state_dict(), 'model/nd_v1.pt')
     f.close()
 
 

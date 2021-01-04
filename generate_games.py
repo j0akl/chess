@@ -1,22 +1,30 @@
 import numpy as np
 from state import State
 
-if __name__ == "__main__":
-    num_games = 1000
-
+def generate_games(num_games, games_location,  net_location=None):
     states = []
 
     for i in range(num_games):
-        print("game ", i + 1)
-        s = State(self_play=True)
+        if net_location is not None:
+            s = State(self_play=True, random=False, net_location=net_location)
+        else:
+            s = State(self_play=True, random=True)
         game = s.play()
         for i in range(len(game)):
             states.append(game[i])
+#         if i % 10 == 0:
+#             print("game ", str(i + 1))
 
-    numpy_games = np.array(states)
-    print(numpy_games.shape)
+    no_draws = list(filter(lambda x: x[0] != 0, states))
+
+    numpy_games = np.array(no_draws)
+    print("Done")
 
     # create and save the array
-    f = open("data/10_games.npz", 'wb')
+    # nd in the filepath means no draws included
+    f = open(games_location, 'wb')
     np.savez(f, numpy_games)
     f.close()
+
+# if __name__ == "__main__":
+
