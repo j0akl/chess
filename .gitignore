@@ -1,6 +1,6 @@
 data/
 env/
-models/
+model/
 __pycache__/
 .DS_Store
 .gitingore
