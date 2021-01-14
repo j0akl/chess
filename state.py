@@ -8,13 +8,9 @@ class State():
     def __init__(self, random=False, self_play=False, color=chess.WHITE,
                  board=None, fen=None, net_location="", device="cpu"):
         self.random = random
-
         self.color = color
-
         self.device = device
-
         self.states = [] # change this if parsing from pgn
-
         self.self_play = self_play
 
         # change the filename here when using different models

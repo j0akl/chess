@@ -99,9 +99,9 @@ def test(model, test_loader, device='cpu'):
         for data, target in test_loader:
             data, target = data.to(device), target.to(device)
             output = model(data)
-            test_loss += F.mse_loss(output, target, reduction='mean').item()
+            test_loss += F.mse_loss(output, target).item()
 
-    test_loss /= len(test_loader.dataset)
+    # test_loss /= len(test_loader.dataset)
 
     print('\nTest set: Average loss: {:.4f}\n'.format(test_loss))
 
